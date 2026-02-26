@@ -1,0 +1,101 @@
+CHANGELOG
+=========
+
+Date: 25/02/2026
+----------------
+Change Type: Addition
+Description: Added email alert functionality for defect ratio NCR alerts
+Details:
+  - Created emailAlert.py (src/Utils/emailAlert.py)
+    - New utility module for sending email alerts
+    - Includes sendmail class for SMTP email sending
+    - Added sendErrorAlertEmail function for NCR alerts
+    - Added program_error_email_content function to generate email content
+  - Updated settings.json (src/JSON/settings.json)
+    - Added "Email" section with email configuration
+    - Includes RTO0006 (Application ID), RTO0010 (Category), RTO0013_01 (Sender), RTO0013_02 (Receiver), RTO0013_03 (CC)
+  - Updated Summary.py (src/Pages/Summary.py)
+    - Added sendDefectRatioEmailAlert method to send email alerts when defect ratios exceed 5%
+    - Integrated email alert prompt in checkDefectRatios function
+    - User can choose to send email alert when defect ratios exceed threshold
+    - Email includes lot number, machine number, input quantity, block weight, and defect details
+
+Change Type: Modification
+Description: Added machine selection (BAC01/BAC02) for per-machine config
+Details:
+  - Updated settings.json (src/JSON/settings.json)
+    - Added "Machine" key with value "BAC01_config" or "BAC02_config"
+    - Controls which config folder is used for item JSON files
+  - Moved misc JSON files to machine-specific directories
+    - All material misc.json files moved from src/JSON/ to src/JSON/BAC01_config/ and src/JSON/BAC02_config/
+    - Files moved: DMA03misc.json, EQA02misc.json, EQA03misc.json, EQAmisc(old).json, EQK02misc.json, EQK03misc.json, ERA03misc.json, ERA15misc.json
+  - Updated readSettings.py (src/Utils/readSettings.py)
+    - Reads "Machine" setting from settings.json
+    - Loads misc JSON from src/JSON/{Machine}/{mat}misc.json instead of src/JSON/{mat}misc.json
+  - Updated Settings.py (src/Pages/Settings.py)
+    - Save path for misc JSON now uses machine config subdirectory
+    - Save path for settings.json updated to use absolute path
+
+Date: [Current Date]
+----------------
+Change Type: Modification & Addition
+Description: Updated material type naming convention and added EQK03 support
+Details:
+  - Renamed material types across all files:
+    - EQA -> EQA02
+    - DMA -> DMA03
+    - ERA -> ERA15
+    - EQK -> EQK02
+  - Updated MainPage.py (src/Pages/MainPage.py)
+    - Updated colorCB function to handle new naming (EQA02, EQK02, DMA03, EQK03)
+    - Updated processImg function to use correct chip types for renamed materials
+  - Updated Accuracy.py (src/Pages/Accuracy.py)
+    - Updated process function to handle renamed materials and EQK03
+  - Updated readSettings.py (src/Utils/readSettings.py)
+    - Changed default material parameter from "EQA" to "EQA02"
+  - Updated settings.json (src/JSON/settings.json)
+    - Renamed Accuracy keys: EQA->EQA02, DMA->DMA03, ERA->ERA15, EQK->EQK02
+    - Added RedTape support to EQK02 (matching DMA03 configuration)
+    - Added EQK03 section with Green, Gold, Rose Gold, and RedTape settings
+  - Updated EQK02misc.json (src/JSON/EQK02misc.json)
+    - Added RedTape color detection with chipType "02"
+    - Updated all color HSV values to match DMA03 configuration
+    - Modified Green and RedTape chipType to support "02"
+  - Created EQK03misc.json (src/JSON/EQK03misc.json)
+    - New configuration file for EQK03 material type
+    - Uses chip size "03" (same as DMA03)
+    - Includes Green, Gold, Rose Gold, and RedTape color configurations
+  - Updated imgProcess.py (src/Utils/imgProcess.py)
+    - Updated comment to reference DMA03 and EQA02
+
+Date: 29/01/2026
+----------------
+Change Type: Addition
+Description: Added EQK material type support
+Details:
+  - Added EQK support in MainPage (src/Pages/MainPage.py)
+    - Updated colorCB function to handle EQK material type
+    - Updated processImg function to use chip type "02" for EQK
+  - Added EQK support in Accuracy (src/Pages/Accuracy.py)
+    - Updated process function to use chip type "02" for EQK
+  - Added EQK configuration in settings.json (src/JSON/settings.json)
+    - Added EQK section with Silver, Gold, Rose Gold, and BlackTape settings
+  - Created new EQKmisc.json file (src/JSON/EQKmisc.json)
+
+Change Type: Addition
+Description: Added out of spec defect ratio alert functionality
+Details:
+  - Added checkDefectRatios function in Summary (src/Pages/Summary.py)
+    - Calculates defect ratio for each defect mode
+    - Highlights rows with light red background when defect ratio exceeds 5%
+    - Shows warning messagebox alerting user to issue NCR when defects exceed 5% threshold
+
+Date: 22/01/2026
+----------------
+Change Type: Removal
+Description: Removed box number functionality
+Details:
+  - Removed box number from MainPage (src/Pages/MainPage.py)
+  - Removed box number from Summary (src/Pages/Summary.py)
+  - Removed box number from Final (src/Pages/Final.py)
+  - Removed box number from Utils files (src/Utils/)

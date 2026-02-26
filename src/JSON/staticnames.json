@@ -1,0 +1,56 @@
+{
+    "Defect Code": {
+        "LOUT": "U1",
+        "WOUT": "U2",
+        "DEFORMED": "U3",
+        "BLUNTCUT": "U4",
+        "ROUGHCUT": "U5",
+        "SLANTCUT": "U6",
+        "LSHIFT": "U7",
+        "WSHIFT": "U8",
+        "STEPSHIFT": "U9",
+        "VPDENT": "UA",
+        "SMEARING": "UB",
+        "PARTIALPRINT": "UC",
+        "SHEETNG": "UD",
+        "RIDGENDENT": "UE",
+        "BROKENBLADE": "UF",
+        "PATTERNDENT": "UK",
+        "LINE": "UL",
+        "DRAGGING": "UR",
+        "ELECTRODEHORN": "US",
+        "CUTDEBRIS": "UT",
+        "OTHERS": "O1",
+        "DROPCHIP": "I1",
+        "SAMPLE": "L1"
+    },
+    "Defect Tape": [
+        "LOUT",
+        "WOUT",
+        "LSHIFT",
+        "WSHIFT",
+        "STEPSHIFT",
+        "OTHERS",
+        "BLUNTCUT",
+        "SLANTCUT",
+        "ROUGHCUT",
+        "DEFORMED"
+    ],
+    "Defect Sticker": {
+        "02": {
+            "Silver": "SMEARING",
+            "Rose Gold": "PATTERNDENT",
+            "Gold": "RIDGENDENT"
+        },
+        "03": {
+            "Green": "SMEARING",
+            "Rose Gold": "PATTERNDENT",
+            "Gold": "RIDGENDENT"
+        },
+        "15": {
+            "Green": "SMEARING",
+            "Rose Gold": "PATTERNDENT",
+            "Gold": "RIDGENDENT"
+        }
+    }
+}

@@ -1,0 +1,174 @@
+{
+    "Machine": "BAC01_config",
+    "Address": {
+        "LightIPv4": "192.168.0.2",
+        "LightPORT": "40001",
+        "QtyWeb": "http://163.50.34.41:30401/mesapps/webservices/api/pts0001/checkLotRegistration/data?lotNo=",
+        "fileServer": "http://163.50.34.24/faupload.php?p=bac",
+        "PRASS": "http://163.50.34.40:8080/prass/jsp/monitor/ProgressDisplayViewer.jsp?dsn=orMesPRASS&Referer=http://163.50.34.40:8080/prass/jsp/shintyoku/index.jsp"
+    },
+    "Credentials": {
+        "Username": "ME",
+        "Password": "pass"
+    },
+    "Config": {
+        "Trouble": false,
+        "Pin Size": "5",
+        "Lighting": "30",
+        "CamResWidth": "1920",
+        "CamResHeight": "1080"
+    },
+    "Tolerance": {
+        "Sticker": "5",
+        "Tape": "400"
+    },
+    "Chip Size": {
+        "02": {
+            "L": "0.428",
+            "W": "0.216"
+        },
+        "03": {
+            "L": "0.680",
+            "W": "0.340"
+        },
+        "15": {
+            "L": "1.126",
+            "W": "0.570"
+        }
+    },
+    "Accuracy": {
+        "EQA02": {
+            "Silver": {
+                "Num": "4",
+                "Area": "64"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "66"
+            },
+            "BlackTape": {
+                "Num": "3",
+                "Area": "3844"
+            }
+        },
+        "EQA03": {
+            "Silver": {
+                "Num": "4",
+                "Area": "64"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "66"
+            },
+            "BlackTape": {
+                "Num": "3",
+                "Area": "3844"
+            }
+        },
+        "DMA03": {
+            "Green": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "65"
+            },
+            "RedTape": {
+                "Num": "3",
+                "Area": "3995"
+            }
+        },
+        "ERA03": {
+            "Green": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "65"
+            },
+            "RedTape": {
+                "Num": "3",
+                "Area": "3995"
+            }
+        },
+        "ERA15": {
+            "Green": {
+                "Num": "4",
+                "Area": "62"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "64"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "64"
+            },
+            "RedTape": {
+                "Num": "3",
+                "Area": "3329"
+            }
+        },
+        "EQK02": {
+            "Green": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "65"
+            },
+            "RedTape": {
+                "Num": "3",
+                "Area": "3995"
+            }
+        },
+        "EQK03": {
+            "Green": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Gold": {
+                "Num": "4",
+                "Area": "63"
+            },
+            "Rose Gold": {
+                "Num": "4",
+                "Area": "65"
+            },
+            "RedTape": {
+                "Num": "3",
+                "Area": "3995"
+            }
+        }
+    },
+    "Email": {
+        "RTO0006": "BAC",
+        "RTO0010": "sendemail",
+        "RTO0013_01": "sp5143@murata.com",
+        "RTO0013_02": "perry.ong@murata.com,",
+        "RTO0013_03": ""
+    }
+}
