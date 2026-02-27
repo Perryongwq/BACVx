@@ -15,6 +15,7 @@ from Utils.saveExcel import Excel
 from Utils.readSettings import readSettings
 from Utils.imgProcess import Process
 from version import get_full_version
+from tkinter import Checkbutton, BooleanVar
 
 
 class MainWindow(readSettings):
@@ -25,6 +26,10 @@ class MainWindow(readSettings):
         if not self.config["Trouble"]:
             # self.light.initialize()
             self.defVar = {}
+            self.defButtons = {}  # Store buttons for manual input mode
+            self.defLabels = {}  # Store labels for normal mode
+            self.defGridPos = {}  # Store grid positions for defects
+            self.evalLotMode = BooleanVar(value=False)  # Evaluation lot toggle state
             self.camera()
             self.win_config()
             self.widgets()
@@ -66,30 +71,40 @@ class MainWindow(readSettings):
         # Create Label for Defect Code, Defect Name, Defect Quantity based from Naming.py
         k, l = 0, 0
         for j, defName in enumerate(self.defCode):
+            Label(defectsInfo, text=f"[{self.defCode[defName]}]").grid(
+                row=l, column=k, padx=7, pady=5, sticky=W
+            )
+            
+            # Store grid position for this defect
+            self.defGridPos[defName] = {'row': l, 'column': k + 1}
+            
+            # For DROPCHIP and SAMPLE, always use button
             if defName == "DROPCHIP" or defName == "SAMPLE":
-                Label(defectsInfo, text=f"[{self.defCode[defName]}]").grid(
-                    row=l, column=k, padx=7, pady=5, sticky=W
-                )
-                Button(
+                btn = Button(
                     defectsInfo,
                     text=defName,
                     command=lambda defName=defName: self.SamDropInput(defName),
-                ).grid(row=l, column=k + 1, pady=5, sticky=W)
-                self.defVar[defName] = Label(
-                    defectsInfo, text="0", width=10, relief=RIDGE
                 )
-                self.defVar[defName].grid(row=l, column=k + 2, pady=5, sticky=W)
+                btn.grid(row=l, column=k + 1, pady=5, sticky=W)
+                self.defButtons[defName] = btn
             else:
-                Label(defectsInfo, text=f"[{self.defCode[defName]}]").grid(
-                    row=l, column=k, padx=7, pady=5, sticky=W
+                # For other defects, create both label and button (button hidden initially)
+                lbl = Label(defectsInfo, text=defName)
+                lbl.grid(row=l, column=k + 1, pady=5, sticky=W)
+                self.defLabels[defName] = lbl
+                
+                btn = Button(
+                    defectsInfo,
+                    text=defName,
+                    command=lambda defName=defName: self.SamDropInput(defName),
                 )
-                Label(defectsInfo, text=defName).grid(
-                    row=l, column=k + 1, pady=5, sticky=W
-                )
-                self.defVar[defName] = Label(
-                    defectsInfo, text="0", width=10, relief=RIDGE
-                )
-                self.defVar[defName].grid(row=l, column=k + 2, pady=5, sticky=W)
+                # Button initially hidden, will be shown in evaluation mode
+                self.defButtons[defName] = btn
+            
+            self.defVar[defName] = Label(
+                defectsInfo, text="0", width=10, relief=RIDGE
+            )
+            self.defVar[defName].grid(row=l, column=k + 2, pady=5, sticky=W)
 
             if j % 2 == 0:
                 k = 3
@@ -191,10 +206,21 @@ class MainWindow(readSettings):
         )
         self.inQtyEdit.grid(row=2, column=1, columnspan=2, pady=3, sticky=E)
 
+        # Evaluation Lot Toggle - placed beside Input Quantity
+        ####################################################################################################
+        evalCheck = Checkbutton(
+            lotMcFrame,
+            text="Eval Mode",
+            variable=self.evalLotMode,
+            command=self.toggleEvalLotMode,
+            font=self.font["L"]
+        )
+        evalCheck.grid(row=2, column=4, padx=(10, 0), pady=3, sticky=W)
+        
         # Spinner for Item Drop Down (02, 03 or 15)
         ####################################################################################################
         AccNChipFrame = LabelFrame(self.frame, bd=3, relief=FLAT)
-        AccNChipFrame.grid(row=len(self.defCode) + 3, column=2, columnspan=2, pady=(0, 2), sticky=EW)
+        AccNChipFrame.grid(row=len(self.defCode) + 2, column=2, columnspan=2, pady=(0, 2), sticky=EW)
         AccNChipFrame.columnconfigure(3, weight=1)
 
         self.chipType = Label(
@@ -440,6 +466,104 @@ class MainWindow(readSettings):
             self.defVar[text].config(text=inputValue)
             Excel(self.filePath, self.defVar, text)
 
+    # Toggle Evaluation Lot Mode with Credential Check
+    ####################################################################################################
+    def toggleEvalLotMode(self):
+        if self.evalLotMode.get():
+            # User wants to enable evaluation mode - check credentials first
+            if not self.checkEvalCredentials():
+                # Credentials failed, uncheck the toggle
+                self.evalLotMode.set(False)
+                return
+            # Credentials passed, enable evaluation mode
+            self.enableEvalMode()
+        else:
+            # Disable evaluation mode
+            self.disableEvalMode()
+
+    # Check Credentials for Evaluation Lot Mode
+    ####################################################################################################
+    def checkEvalCredentials(self):
+        from tkinter import Toplevel, Entry, Label, Button, StringVar
+        
+        loginWindow = Toplevel(self.root)
+        loginWindow.title("Evaluation Lot Login")
+        loginWindow.config(bg='lightgrey', bd=50)
+        loginWindow.geometry(f"{int(self.Wscreen/4)}x{int(self.Hscreen/4)}+{int(self.Wscreen*3/8)}+{int(self.Hscreen*3/8)}")
+        loginWindow.grab_set()
+        
+        the_user = StringVar()
+        the_pass = StringVar()
+        
+        LogEntry = {}
+        LogEntry['Username'] = Entry(loginWindow, textvariable=the_user)
+        LogEntry['Password'] = Entry(loginWindow, textvariable=the_pass, show='*')
+        bad_pass = Label(loginWindow, bg='red')
+        
+        for i, cred in enumerate(self.credentials):
+            Label(loginWindow, text=cred + ' :', background='lightgrey').grid(row=i, column=1)
+            LogEntry[cred].grid(row=i, column=2, columnspan=2)
+        
+        result = [False]  # Use list to allow modification in nested function
+        
+        def check_login():
+            if the_user.get() == self.credentials['Username']:
+                if the_pass.get() == self.credentials['Password']:
+                    result[0] = True
+                    loginWindow.destroy()
+                else:
+                    bad_pass.config(text="Password does not match")
+                    bad_pass.grid(row=2, column=2, columnspan=2)
+                    LogEntry['Password'].delete(0, 'end')
+            else:
+                bad_pass.config(text="Username does not exist")
+                bad_pass.grid(row=2, column=2, columnspan=2)
+                LogEntry['Username'].delete(0, 'end')
+                LogEntry['Username'].focus()
+                LogEntry['Password'].delete(0, 'end')
+        
+        Button(loginWindow, text="Login", command=check_login).grid(row=6, column=2, columnspan=2)
+        
+        # Wait for window to close
+        loginWindow.wait_window()
+        return result[0]
+
+    # Enable Evaluation Mode - Make all defects manually inputtable
+    ####################################################################################################
+    def enableEvalMode(self):
+        for defName in self.defCode:
+            if defName != "DROPCHIP" and defName != "SAMPLE":
+                # Hide label, show button
+                if defName in self.defLabels:
+                    self.defLabels[defName].grid_remove()
+                if defName in self.defButtons and defName in self.defGridPos:
+                    # Get the grid position from stored position
+                    pos = self.defGridPos[defName]
+                    self.defButtons[defName].grid(
+                        row=pos['row'],
+                        column=pos['column'],
+                        pady=5,
+                        sticky=W
+                    )
+
+    # Disable Evaluation Mode - Restore normal mode
+    ####################################################################################################
+    def disableEvalMode(self):
+        for defName in self.defCode:
+            if defName != "DROPCHIP" and defName != "SAMPLE":
+                # Hide button, show label
+                if defName in self.defButtons:
+                    self.defButtons[defName].grid_remove()
+                if defName in self.defLabels and defName in self.defGridPos:
+                    # Get the grid position from stored position
+                    pos = self.defGridPos[defName]
+                    self.defLabels[defName].grid(
+                        row=pos['row'],
+                        column=pos['column'],
+                        pady=5,
+                        sticky=W
+                    )
+
     # Preparing Camera for image to process
     ####################################################################################################
     def prepCam(self):
@@ -487,34 +611,65 @@ class MainWindow(readSettings):
                     )
                     return
 
-                baseimg, image, Defects = Process(
-                    self.root, imgArr, False, self.Wscreen, self.Hscreen, chip, mat
-                ).res
-                self.saveImg(
-                    baseimg,
-                    "block",
-                    self.lotNumberEdit.get()
-                    + "_"
-                    + datetime.today().strftime("%d-%m-%y_%H%M%S"),
-                )
-                img = PilImg.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-                img = img.resize((int(img.size[0] * 0.75), int(img.size[1] * 0.75)))
-                imgtk = ImageTk.PhotoImage(image=img)
-                self.capture.imgtk = imgtk
-                self.capture.config(image=imgtk)
-
-                for defappend in self.defVar:
-                    if defappend == "DROPCHIP" or defappend == "SAMPLE":
-                        addition = (
-                            int(self.defVar[defappend].cget("text"))
-                            + Defects[defappend]
+                # Check if evaluation lot mode is enabled
+                if self.evalLotMode.get():
+                    # Evaluation mode: Only capture and save image, skip defect detection
+                    baseimg = imgArr[0] if imgArr else None
+                    if baseimg is not None:
+                        self.saveImg(
+                            baseimg,
+                            "block",
+                            self.lotNumberEdit.get()
+                            + "_"
+                            + datetime.today().strftime("%d-%m-%y_%H%M%S"),
                         )
-                        self.defVar[defappend].config(text=str(addition))
-                    else:
-                        self.defVar[defappend].config(text=Defects[defappend])
+                        # Display the captured image
+                        img = PilImg.fromarray(cv2.cvtColor(baseimg, cv2.COLOR_BGR2RGB))
+                        img = img.resize((int(img.size[0] * 0.75), int(img.size[1] * 0.75)))
+                        imgtk = ImageTk.PhotoImage(image=img)
+                        self.capture.imgtk = imgtk
+                        self.capture.config(image=imgtk)
+                        
+                        # Initialize Excel file with defect structure (all zeros)
+                        # This ensures the file is ready for manual defect input
+                        Excel(self.filePath, self.defVar)
+                        
+                        # In evaluation mode, user will manually input defects
+                        # Don't process defects, just save the image
+                        messagebox.showinfo(
+                            "Evaluation Mode",
+                            "Image captured. Please manually input defect quantities."
+                        )
+                else:
+                    # Normal mode: Process image and detect defects
+                    baseimg, image, Defects = Process(
+                        self.root, imgArr, False, self.Wscreen, self.Hscreen, chip, mat
+                    ).res
+                    self.saveImg(
+                        baseimg,
+                        "block",
+                        self.lotNumberEdit.get()
+                        + "_"
+                        + datetime.today().strftime("%d-%m-%y_%H%M%S"),
+                    )
+                    img = PilImg.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+                    img = img.resize((int(img.size[0] * 0.75), int(img.size[1] * 0.75)))
+                    imgtk = ImageTk.PhotoImage(image=img)
+                    self.capture.imgtk = imgtk
+                    self.capture.config(image=imgtk)
 
-                Excel(self.filePath, self.defVar)
-                cv2.destroyAllWindows()
+                    for defappend in self.defVar:
+                        if defappend == "DROPCHIP" or defappend == "SAMPLE":
+                            addition = (
+                                int(self.defVar[defappend].cget("text"))
+                                + Defects[defappend]
+                            )
+                            self.defVar[defappend].config(text=str(addition))
+                        else:
+                            self.defVar[defappend].config(text=Defects[defappend])
+
+                    Excel(self.filePath, self.defVar)
+                    cv2.destroyAllWindows()
             except Exception as e:
                 print(e)
                 messagebox.showerror(
@@ -557,6 +712,7 @@ class MainWindow(readSettings):
         self.chipType.config(text="ChipType", bg="#ecedcc")
         for defName in self.defCode:
             self.defVar[defName].config(text="0")
+        # Note: Evaluation mode toggle state is preserved across resets
 
     # Saving Images
     ####################################################################################################
