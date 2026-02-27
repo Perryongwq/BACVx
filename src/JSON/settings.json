@@ -1,5 +1,5 @@
 {
-    "Machine": "BAC01_config",
+    "Machine": "BAC02_config",
     "Address": {
         "LightIPv4": "192.168.0.2",
         "LightPORT": "40001",
@@ -167,8 +167,8 @@
     "Email": {
         "RTO0006": "BAC",
         "RTO0010": "sendemail",
-        "RTO0013_01": "sp5143@murata.com",
-        "RTO0013_02": "perry.ong@murata.com,",
+        "RTO0013_01": "BAC-NCR-Alert@murata.com",
+        "RTO0013_02": "perry.ong@murata.com,ahnee.wong@murata.com, mayting.yap@murata.com, ailee.wong@murata.com,seakting.lim@murata.com, hong.yang@murata.com, siensuan.bong@murata.com, chanchan.tam@murata.com ",
         "RTO0013_03": ""
     }
 }

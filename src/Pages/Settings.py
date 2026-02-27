@@ -131,8 +131,22 @@ class Settings(readSettings):
 
         # [Tab 2] Config Tab
         ####################################################################################################
+        # Machine Selection (always editable, at the top)
+        ttk.Label(tab2,text='Machine',font=self.font,width=int(self.length*1.3)).grid(row=0,column=0,padx=(10,5),pady=5)
+        self.machineVar = StringVar(value=self.machine)
+        self.originalMachine = self.machine  # Store original machine to detect changes
+        machineOptions = ["BAC01_config", "BAC02_config"]
+        machineDrop = OptionMenu(tab2, self.machineVar, *machineOptions)
+        machineDrop.config(width=int(self.length*1.3), state=NORMAL)
+        machineDrop.grid(row=0,column=1,columnspan=2,padx=5,pady=5,sticky=W)
+        # Add callback to warn user when machine changes (they may need to reload settings)
+        self.machineVar.trace("w", lambda *args: self.on_machine_change())
+        
+        # Separator
+        ttk.Separator(tab2, orient=HORIZONTAL).grid(row=1,column=0,columnspan=3,sticky=EW,padx=10,pady=10)
+        
         for b, conf in enumerate(self.config):
-            ttk.Label(tab2,text=conf,font=self.font,width=int(self.length*1.3)).grid(row=b,column=0,padx=(10,5),pady=5)
+            ttk.Label(tab2,text=conf,font=self.font,width=int(self.length*1.3)).grid(row=b+2,column=0,padx=(10,5),pady=5)
 
             if conf == "Trouble":
                 s = ttk.Style()
@@ -140,22 +154,22 @@ class Settings(readSettings):
 
                 self.figVar[conf] = BooleanVar(value=self.config[conf])
                 self.fig[conf+"True"] = ttk.Radiobutton(tab2,text="True",value=1,state=DISABLED,variable=self.figVar[conf],style='Radio.TRadiobutton')
-                self.fig[conf+"True"].grid(row=b,column=1,padx=5,pady=5,sticky=EW)
+                self.fig[conf+"True"].grid(row=b+2,column=1,padx=5,pady=5,sticky=EW)
                 self.fig[conf+"False"] = ttk.Radiobutton(tab2,text="False",value=0,state=DISABLED,variable=self.figVar[conf],style='Radio.TRadiobutton')
-                self.fig[conf+"False"].grid(row=b,column=2,padx=5,pady=5,sticky=EW)
+                self.fig[conf+"False"].grid(row=b+2,column=2,padx=5,pady=5,sticky=EW)
             else:
                 self.figVar[conf] = StringVar(value=self.config[conf])
                 self.fig[conf] = ttk.Entry(tab2,font=self.font,justify=CENTER,state=DISABLED,foreground='#777',textvariable=self.figVar[conf],width=self.length*4)
-                self.fig[conf].grid(row=b,column=1,columnspan=2,padx=5,pady=5,sticky=EW)
+                self.fig[conf].grid(row=b+2,column=1,columnspan=2,padx=5,pady=5,sticky=EW)
 
         # Select Dropdown box for Misc
         self.figSel = StringVar(value=self.setTxt)
         figdrop = OptionMenu(tab2,self.figSel,*self.config)
         figdrop.config(width=int(self.length*1.3))
-        figdrop.grid(row=b+1,column=1,padx=(0,10),pady=20,sticky=N)
+        figdrop.grid(row=b+3,column=1,padx=(0,10),pady=20,sticky=N)
 
         btn2 = Button(tab2,text=self.edit,font=self.font,width=self.length,command=lambda: self.modify(tabCont.tab(tabCont.select(),'text'),btn2))
-        btn2.grid(row=b+1,column=2,padx=10,pady=20,sticky=N)
+        btn2.grid(row=b+3,column=2,padx=10,pady=20,sticky=N)
 
         # [Tab 3] Chips Tab
         ####################################################################################################
@@ -388,6 +402,9 @@ class Settings(readSettings):
             pass
 
     def save(self,mat):
+        # Save Machine selection
+        self.setData['Machine'] = self.machineVar.get()
+        
         for col in self.color:
             self.miscData['Color'][col]['LL'] = self.colLL[col].cget('text')
             self.miscData['Color'][col]['UL'] = self.colUL[col].cget('text')
@@ -415,7 +432,9 @@ class Settings(readSettings):
             json.dump(self.setData,f,indent=4)
             f.truncate()
 
-        with open(os.path.join(self.srcPath, 'JSON', self.machine, f'{mat}misc.json'),"w") as f:
+        # Use the selected machine for saving misc.json
+        selectedMachine = self.machineVar.get()
+        with open(os.path.join(self.srcPath, 'JSON', selectedMachine, f'{mat}misc.json'),"w") as f:
             f.seek(0)
             json.dump(self.miscData,f,indent=4)
             f.truncate()
@@ -426,6 +445,18 @@ class Settings(readSettings):
         self.light.lightingOff()
         self.root.destroy()
 
+    def on_machine_change(self):
+        """Called when machine selection changes - warns user that color settings are from original machine"""
+        newMachine = self.machineVar.get()
+        if newMachine != self.originalMachine:
+            messagebox.showwarning(
+                'Machine Changed',
+                f'Machine selection changed to {newMachine}.\n\n'
+                'Note: Color settings displayed are still from the original machine.\n'
+                'To see the new machine\'s color settings, close and reopen the Settings window.',
+                parent=self.root
+            )
+    
     def msgBox(self,text):
         messagebox.showinfo('Prompt',f'Select a colour to {text}', parent=self.root)
 

@@ -14,6 +14,7 @@ from Pages.Summary import Summary
 from Utils.saveExcel import Excel
 from Utils.readSettings import readSettings
 from Utils.imgProcess import Process
+from version import get_full_version
 
 
 class MainWindow(readSettings):
@@ -22,11 +23,11 @@ class MainWindow(readSettings):
         self.root = root
         self.light = Lighting()
         if not self.config["Trouble"]:
-        self.light.initialize()
-        self.defVar = {}
-        self.camera()
-        self.win_config()
-        self.widgets()
+            # self.light.initialize()
+            self.defVar = {}
+            self.camera()
+            self.win_config()
+            self.widgets()
 
     def camera(self):
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -35,7 +36,7 @@ class MainWindow(readSettings):
 
     def win_config(self):
         self.root.state("zoomed")
-        self.root.title("Block Cutting Automation")
+        self.root.title(f"Block Cutting Automation - {get_full_version()}")
         self.Hscreen = self.root.winfo_screenheight()
         self.Wscreen = self.root.winfo_screenwidth()
         self.frame = Frame(self.root)
