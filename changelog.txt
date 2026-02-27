@@ -1,6 +1,31 @@
 CHANGELOG
 =========
 
+Date: 27/02/2026
+----------------
+Change Type: Addition
+Description: Added version tracking system and machine selection UI in Settings
+Details:
+  - Created version.py (src/version.py)
+    - Centralized version information management
+    - Version: 1.2.0
+    - Includes get_version(), get_version_info(), and get_full_version() functions
+    - Tracks build date and author information
+  - Updated MainPage.py (src/Pages/MainPage.py)
+    - Window title now displays version information: "Block Cutting Automation - BAC v1.2.0 (Build: 2026-01-26)"
+    - Imported version module for version display
+  - Updated main.py (src/main.py)
+    - Added version information display on application startup
+    - Prints full version string when application starts
+  - Updated Settings.py (src/Pages/Settings.py)
+    - Added Machine selection dropdown in Config tab
+    - Users can now select between BAC01_config and BAC02_config from the UI
+    - Machine selection is always editable (no Edit button required)
+    - Added visual separator between Machine selection and other config settings
+    - Machine selection is saved to settings.json when "Save Changes" is clicked
+    - Added warning notification when machine selection changes to inform users about color settings
+    - Updated save() method to save Machine selection and use selected machine directory for misc.json
+
 Date: 25/02/2026
 ----------------
 Change Type: Addition
