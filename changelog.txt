@@ -1,6 +1,38 @@
 CHANGELOG
 =========
 
+Date: 02/03/2026
+----------------
+Change Type: Addition
+Description: Added Evaluation Lot Mode toggle with credential verification
+Details:
+  - Added Evaluation Lot Mode toggle switch in MainPage.py (src/Pages/MainPage.py)
+    - Toggle switch labeled "Eval Mode" placed beside Input Quantity field
+    - Uses standard font size (font["L"]) for better visibility
+    - Requires credential verification (same as Settings page) before enabling
+  - Evaluation Mode functionality:
+    - When enabled, all defect types become manually inputtable (similar to DROPCHIP/SAMPLE)
+    - Converts defect labels to clickable buttons for manual input
+    - When disabled, returns to normal automatic defect detection mode
+  - Image capture in Evaluation Mode:
+    - Captures and saves images only (skips automatic defect detection)
+    - Displays captured image to user
+    - Initializes Excel file structure for manual defect entry
+    - Shows message prompting user to manually input defect quantities
+  - Credential verification:
+    - Created checkEvalCredentials() method for login verification
+    - Uses same username/password credentials as Settings page access
+    - Toggle remains unchecked if credentials fail
+  - UI improvements:
+    - Toggle positioned beside Input Quantity field for better accessibility
+    - Toggle state persists across resets
+
+Change Type: Modification
+Description: Updated Evaluation Lot Mode toggle font size
+Details:
+  - Updated MainPage.py (src/Pages/MainPage.py)
+    - Changed Evaluation Lot Mode toggle font from font["S"] to font["L"] for better visibility
+
 Date: 27/02/2026
 ----------------
 Change Type: Addition
