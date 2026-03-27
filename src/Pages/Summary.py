@@ -137,9 +137,20 @@ class Summary(readSettings):
                 # Calculate defect ratio
                 if totalDefects > 0:
                     defectRatio = (totalDefects / inqty) * 100  # Convert to percentage
-                    
-                    # If ratio > 5%, highlight the row
-                    if defectRatio > 5.0:
+
+                    # Custom trigger rules:
+                    # ROUGHCUT: ratio > 20%
+                    # LOUT: total defects > 1 piece
+                    # Others: ratio > 5%
+                    isOutOfSpec = False
+                    if defectMode == "ROUGHCUT":
+                        isOutOfSpec = defectRatio > 20.0
+                    elif defectMode == "LOUT":
+                        isOutOfSpec = totalDefects > 1
+                    else:
+                        isOutOfSpec = defectRatio > 5.0
+
+                    if isOutOfSpec:
                         outOfSpecDefects.append((defectMode, defectRatio, totalDefects))
                         # Highlight all labels in this row
                         if j in self.defectLabels:
@@ -152,14 +163,18 @@ class Summary(readSettings):
                                        for mode, ratio, total in outOfSpecDefects])
                 messagebox.showwarning(
                     "Out of Spec alert : Please Issue NCR",
-                    f"The following defect modes exceed 5%:\n\n{defectList}\n\nPlease Issue NCR before continuing.",
+                    f"The following defect modes exceeded alert limits:\n"
+                    f"- ROUGHCUT > 20%\n"
+                    f"- LOUT > 1 piece\n"
+                    f"- Other modes > 5%\n\n"
+                    f"{defectList}\n\nPlease Issue NCR before continuing.",
                     parent=self.root
                 )
                 
                 # Show popup prompt to send email alert
                 send_email = messagebox.askyesno(
                     "Email Alert",
-                    f"Defect ratios exceed 5% threshold.\n\nWould you like to send an email alert before proceeding?",
+                    f"Defect counts/ratios exceeded alert limits.\n\nWould you like to send an email alert before proceeding?",
                     parent=self.root
                 )
                 
@@ -216,10 +231,10 @@ class Summary(readSettings):
             defect_info = []
             for mode, ratio, total in outOfSpecDefects:
                 defect_info.append(f"{mode}: {ratio:.2f}% ({int(total)} defects)")
-            defect_details["Defect Modes Exceeding 5%"] = "\n".join(defect_info)
+            defect_details["Defect Modes Exceeding Alert Limits"] = "\n".join(defect_info)
             
             # Send email alert
-            error_type = f"NCR Alert - Defect Ratio Exceeds 5% (Lot: {self.inData[0]})"
+            error_type = f"NCR Alert - Defect Alert Limits Exceeded (Lot: {self.inData[0]})"
             sendErrorAlertEmail(
                 emaildf,
                 "sendemail",

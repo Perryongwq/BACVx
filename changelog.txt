@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+Date: 27/03/2026
+----------------
+Change Type: Modification
+Description: Updated NCR alert thresholds with defect-mode-specific rules
+Details:
+  - Updated Summary.py (src/Pages/Summary.py)
+    - Changed checkDefectRatios() to apply per-mode alert thresholds instead of a flat 5% rule:
+      - ROUGHCUT: triggers alert when defect ratio > 20%
+      - LOUT: triggers alert when total defects > 1 piece
+      - All other defect modes: retain existing > 5% ratio rule
+    - Highlighted out-of-spec rows are still coloured light red (#ffcccc)
+    - Updated warning popup message to list all three threshold rules clearly
+    - Updated email prompt text to reference "alert limits" instead of "5% threshold"
+    - Updated email details key from "Defect Modes Exceeding 5%" to "Defect Modes Exceeding Alert Limits"
+    - Updated email subject/error_type to "NCR Alert - Defect Alert Limits Exceeded"
+
 Date: 02/03/2026
 ----------------
 Change Type: Addition
