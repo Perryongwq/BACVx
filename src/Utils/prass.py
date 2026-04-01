@@ -72,15 +72,17 @@ class PRASS(readSettings):
         time = datetime.now().strftime("%H:%M:%S")
 
         df = df.loc[(df!=0).any(axis=1)]
+        defect_rows = max(len(df["Total"]) - 1, 0)
 
         # Consolidate retrieved defects
         prassDef = ""
         for i, dataQty in enumerate(df["Total"]):
-            if i < len(df["Total"]) - 1: prassDef += f"{self.defCode[df.index[i]]}|{dataQty}|" 
+            if i < defect_rows: prassDef += f"{self.defCode[df.index[i]]}|{dataQty}|" 
 
         # Range predetermined (Can be changed to increase)
-        for j in range(10-(len(df["Total"])-1)):
-            if j != range(10-(len(df["Total"])-1))[-1]: prassDef += "||" 
+        empty_slots = 10 - defect_rows
+        for j in range(empty_slots):
+            if j != range(empty_slots)[-1]: prassDef += "||" 
             else: prassDef += "|"
 
         # File Spec to follow - Added block weight at the end
