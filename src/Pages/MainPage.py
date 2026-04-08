@@ -598,7 +598,7 @@ class MainWindow(readSettings):
         # Force the correct chip type based on material type
         # This ensures EQA02 always uses "02", DMA03 uses "03", and ERA15 uses "15"
         # regardless of what comes from the API or chip type extraction
-        chip = "02" if mat == "EQA02" or mat == "EQK02" else "03" if mat == "DMA03" or mat == "EQK03" or mat == "EQA03" else "15"
+        chip = "02" if mat == "EQA02" or mat == "EQK02" else "03" if mat == "DMA03" or mat == "EQK03" or mat == "EQA03" or mat == "ERA03" else "15"
 
         for defName in self.defCode:
             self.defVar[defName].config(text="0")
