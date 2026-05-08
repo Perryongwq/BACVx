@@ -90,5 +90,5 @@ class prePRASS(readSettings):
         self.showFinal(newdf)
 
     def showFinal(self,newdf):
-        if not self.config['Trouble']: self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen,self.lotNum).res
-        else: self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen).res
+        if not self.config['Trouble']: self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen,self.lotNum,self.inQty).res
+        else: self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen,inQty=self.inQty).res

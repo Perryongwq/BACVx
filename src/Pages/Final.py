@@ -3,12 +3,12 @@ from tkinter import *
 from Utils.readSettings import readSettings
 
 class showFinal(readSettings):
-    def __init__(self,root,df,Wscreen,Hscreen,lotNum="22X0282300"):
+    def __init__(self,root,df,Wscreen,Hscreen,lotNum="22X0282300",inQty=0):
         super().__init__()
         self.root = Toplevel(root)
         self.initialize(Wscreen,Hscreen)
         self.win_config()
-        self.widgets(df,lotNum)
+        self.widgets(df,lotNum,inQty)
         self.root.grab_set()
         self.root.mainloop()
 
@@ -23,7 +23,7 @@ class showFinal(readSettings):
         self.frame.rowconfigure(1,weight=1)
         self.frame.pack(fill=BOTH, expand=True)
 
-    def widgets(self,df,lotNum):
+    def widgets(self,df,lotNum,inQty):
 
         # Labelframe for Lot Number Data
         ####################################################################################################
@@ -57,6 +57,16 @@ class showFinal(readSettings):
             else:
                 k = 0 
                 l += 1
+
+        # Final Quantity = Input Quantity - Total Defect
+        ####################################################################################################
+        totalDefect = int(df.loc['Total Defects'][0]) if 'Total Defects' in df.index else 0
+        finalQty = int(inQty) - totalDefect
+
+        l += 1
+        finalCont = LabelFrame(self.frame, bd=5, relief=FLAT)
+        finalCont.grid(row=2, column=0, columnspan=2, padx=3, pady=3, sticky=NSEW)
+        Label(finalCont, text=f"Final Output:  {inQty} - {totalDefect} = {finalQty}", font=self.font['XL']).grid(row=0, column=0, padx=15, pady=5, sticky=W)
 
     def close(self):
         self.res = False

@@ -118,10 +118,10 @@ class PRASS(readSettings):
                     # Request OK, bring up website and final quantity for final cross check
                     # if resp.ok:
                     if int(resp.content) == os.stat(os.path.join(self.path,f'{self.lotNum}.txt')).st_size:
-                        self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen,self.lotNum).res
+                        self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen,self.lotNum,self.inQty).res
                 except Exception as e:
                     messagebox.showwarning(title="Error while sending",message="File not sent to PRASS. Contact ME.") 
                     print(e)
             else:
                 print("Sending to PRASS")
-                self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen).res
+                self.res = showFinal(self.root,newdf,self.Wscreen,self.Hscreen,inQty=self.inQty).res
